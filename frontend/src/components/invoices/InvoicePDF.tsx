@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, Image, StyleSheet, Font } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/renderer'
 import type { Invoice, Settings } from '@/types/database'
 
 // Matches generate_invoice.py reference layout exactly:
