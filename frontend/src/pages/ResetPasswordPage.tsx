@@ -13,7 +13,7 @@ interface ResetForm {
 export default function ResetPasswordPage() {
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<ResetForm>()
+  const { register, handleSubmit, formState: { errors } } = useForm<ResetForm>()
 
   const onSubmit = async (values: ResetForm) => {
     if (values.password !== values.confirmPassword) {
