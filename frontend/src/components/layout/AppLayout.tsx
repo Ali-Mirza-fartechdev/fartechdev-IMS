@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import {
-  LayoutDashboard, Users, FileText, Wallet, BarChart3, Settings as SettingsIcon, LogOut,
+  LayoutDashboard, Users, FileText, BarChart3, Settings as SettingsIcon, LogOut,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import logo from '@/assets/logo.png'
