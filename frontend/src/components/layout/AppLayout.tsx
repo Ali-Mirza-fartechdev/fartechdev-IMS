@@ -20,7 +20,7 @@ export default function AppLayout() {
     <div className="flex h-screen w-full overflow-hidden bg-background">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-surface md:flex">
         <div className="flex items-center gap-2 px-6 py-6">
-          <img src={logo} alt="FAR Tech" className="h-8 w-8" />
+          <img src={logo} alt="FAR Tech" className="h-9 w-auto" />
           <div>
             <p className="text-sm font-bold leading-tight">FAR Tech &</p>
             <p className="text-sm font-bold leading-tight">Developers</p>

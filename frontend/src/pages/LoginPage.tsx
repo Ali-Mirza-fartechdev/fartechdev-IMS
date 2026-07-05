@@ -53,7 +53,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="glass w-full max-w-sm rounded-2xl p-8">
         <div className="mb-8 flex flex-col items-center">
-          <img src={logo} alt="FAR Tech" className="h-14 w-14" />
+          <img src={logo} alt="FAR Tech" className="h-16 w-auto" />
           <h1 className="mt-4 text-lg font-bold text-white">FAR Tech & Developers</h1>
           <p className="text-sm text-muted">Invoice & Revenue Management</p>
         </div>
