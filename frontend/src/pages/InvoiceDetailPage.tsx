@@ -51,7 +51,13 @@ export default function InvoiceDetailPage() {
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">{invoice.invoice_number}</h1>
-          <Link to={`/clients/${invoice.client_id}`} className="text-sm text-accent-light">{invoice.client?.name}</Link>
+          {invoice.client_id ? (
+            <Link to={`/clients/${invoice.client_id}`} className="text-sm text-accent-light">
+              {invoice.client?.name ?? invoice.client_name_snapshot}
+            </Link>
+          ) : (
+            <p className="text-sm text-muted">{invoice.client_name_snapshot ?? 'Client deleted'}</p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge className={STATUS_COLORS[invoice.status]}>{STATUS_LABELS[invoice.status]}</Badge>

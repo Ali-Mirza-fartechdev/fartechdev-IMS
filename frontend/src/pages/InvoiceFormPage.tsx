@@ -8,7 +8,7 @@ import { useClients } from '@/hooks/useClients'
 import { useInvoice, useCreateInvoice, useUpdateInvoice } from '@/hooks/useInvoices'
 import { useSettings } from '@/hooks/useSettings'
 import { Button, Input, Select, Textarea, Card } from '@/components/ui/primitives'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, CURRENCIES } from '@/lib/utils'
 
 export default function InvoiceFormPage() {
   const { id } = useParams<{ id: string }>()
@@ -64,6 +64,7 @@ export default function InvoiceFormPage() {
   }, [existing, reset])
 
   const items = watch('items')
+  const currency = watch('currency') || 'USD'
   const discount = watch('discount') || 0
   const taxRate = settings?.tax_percentage ?? 0
   const subtotal = items.reduce((sum, it) => sum + (Number(it.quantity) || 0) * (Number(it.unit_price) || 0), 0)
@@ -98,13 +99,16 @@ export default function InvoiceFormPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
         <Card>
           <h3 className="mb-4 text-sm font-semibold text-white">Invoice Information</h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <Select label="Client" error={errors.client_id?.message} disabled={readOnly} {...register('client_id')}>
               <option value="">Select client...</option>
               {clients?.map((c) => <option key={c.id} value={c.id}>{c.name} {c.company ? `(${c.company})` : ''}</option>)}
             </Select>
             <Input label="Invoice Date" type="date" disabled={readOnly} error={errors.invoice_date?.message} {...register('invoice_date')} />
             <Input label="Due Date" type="date" disabled={readOnly} error={errors.due_date?.message} {...register('due_date')} />
+            <Select label="Currency" disabled={readOnly} {...register('currency')}>
+              {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
+            </Select>
             <Select label="Status" disabled={readOnly} {...register('status')}>
               {['draft', 'sent', 'pending_approval', 'approved', 'pending_payment', 'paid', 'delivered', 'cancelled'].map((s) => (
                 <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -154,8 +158,8 @@ export default function InvoiceFormPage() {
 
           <div className="mt-6 flex justify-end">
             <div className="w-full max-w-xs space-y-2 text-sm">
-              <div className="flex justify-between text-muted"><span>Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
-              <div className="flex justify-between text-muted"><span>Tax ({taxRate}%)</span><span>{formatCurrency(tax)}</span></div>
+              <div className="flex justify-between text-muted"><span>Subtotal</span><span>{formatCurrency(subtotal, currency)}</span></div>
+              <div className="flex justify-between text-muted"><span>Tax ({taxRate}%)</span><span>{formatCurrency(tax, currency)}</span></div>
               <div className="flex items-center justify-between text-muted">
                 <span>Discount</span>
                 <input
@@ -165,7 +169,7 @@ export default function InvoiceFormPage() {
                 />
               </div>
               <div className="flex justify-between border-t border-border pt-2 text-base font-bold text-white">
-                <span>Grand Total</span><span className="text-accent-light">{formatCurrency(grandTotal)}</span>
+                <span>Grand Total</span><span className="text-accent-light">{formatCurrency(grandTotal, currency)}</span>
               </div>
             </div>
           </div>

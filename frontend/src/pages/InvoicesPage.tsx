@@ -36,35 +36,63 @@ export default function InvoicesPage() {
         </Button>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-6 flex flex-wrap items-end gap-3">
         <div className="relative w-full max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+          <label className="mb-1.5 block text-xs font-medium text-muted">Search</label>
+          <Search className="absolute left-3 top-[38px] h-4 w-4 -translate-y-1/2 text-muted" />
           <Input
-            placeholder="Search invoice #..."
-            className="pl-9"
+            placeholder="Invoice #..."
+            className="h-[42px] pl-9"
             value={filters.search ?? ''}
             onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
           />
         </div>
-        <Select
-          className="w-48"
-          value={filters.status}
-          onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as InvoiceStatus | 'all' }))}
-        >
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s} value={s}>{s === 'all' ? 'All Statuses' : STATUS_LABELS[s]}</option>
-          ))}
-        </Select>
-        <Select
-          className="w-48"
-          value={filters.clientId ?? ''}
-          onChange={(e) => setFilters((f) => ({ ...f, clientId: e.target.value || undefined }))}
-        >
-          <option value="">All Clients</option>
-          {clients?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </Select>
-        <Input type="date" value={filters.dateFrom ?? ''} onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value || undefined }))} className="w-40" />
-        <Input type="date" value={filters.dateTo ?? ''} onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value || undefined }))} className="w-40" />
+        <div className="w-40">
+          <label className="mb-1.5 block text-xs font-medium text-muted">Status</label>
+          <Select
+            className="h-[42px]"
+            value={filters.status}
+            onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as InvoiceStatus | 'all' }))}
+          >
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>{s === 'all' ? 'All Statuses' : STATUS_LABELS[s]}</option>
+            ))}
+          </Select>
+        </div>
+        <div className="w-40">
+          <label className="mb-1.5 block text-xs font-medium text-muted">Client</label>
+          <Select
+            className="h-[42px]"
+            value={filters.clientId ?? ''}
+            onChange={(e) => setFilters((f) => ({ ...f, clientId: e.target.value || undefined }))}
+          >
+            <option value="">All Clients</option>
+            {clients?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </Select>
+        </div>
+        <div className="w-36">
+          <label className="mb-1.5 block text-xs font-medium text-muted">From</label>
+          <Input
+            type="date"
+            className="h-[42px]"
+            value={filters.dateFrom ?? ''}
+            onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value || undefined }))}
+          />
+        </div>
+        <div className="w-36">
+          <label className="mb-1.5 block text-xs font-medium text-muted">To</label>
+          <Input
+            type="date"
+            className="h-[42px]"
+            value={filters.dateTo ?? ''}
+            onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value || undefined }))}
+          />
+        </div>
+        {(filters.search || (filters.status && filters.status !== 'all') || filters.clientId || filters.dateFrom || filters.dateTo) && (
+          <Button variant="ghost" className="h-[42px]" onClick={() => setFilters({ status: 'all' })}>
+            Clear
+          </Button>
+        )}
       </div>
 
       <Card className="mt-6 !p-0 overflow-hidden">
@@ -93,7 +121,7 @@ export default function InvoicesPage() {
                     <td className="px-5 py-3">
                       <Link to={`/invoices/${inv.id}`} className="font-medium text-accent-light">{inv.invoice_number}</Link>
                     </td>
-                    <td className="px-5 py-3 text-white">{inv.client?.name}</td>
+                    <td className="px-5 py-3 text-white">{inv.client?.name ?? inv.client_name_snapshot ?? '— (client deleted)'}</td>
                     <td className="px-5 py-3 text-muted">{formatDate(inv.invoice_date)}</td>
                     <td className="px-5 py-3 text-muted">{formatDate(inv.due_date)}</td>
                     <td className="px-5 py-3"><Badge className={STATUS_COLORS[inv.status]}>{STATUS_LABELS[inv.status]}</Badge></td>

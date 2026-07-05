@@ -35,7 +35,8 @@ export interface Client {
 export interface Invoice {
   id: string
   invoice_number: string
-  client_id: string
+  client_id: string | null
+  client_name_snapshot: string | null
   invoice_date: string
   due_date: string
   currency: string

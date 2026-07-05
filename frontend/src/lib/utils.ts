@@ -47,3 +47,36 @@ export function generateSequenceHint(prefix: string): string {
   const year = new Date().getFullYear()
   return `${prefix}-${year}-XXXX`
 }
+
+export const CURRENCIES = [
+  { code: 'USD', label: 'USD — US Dollar' },
+  { code: 'PKR', label: 'PKR — Pakistani Rupee' },
+  { code: 'GBP', label: 'GBP — British Pound' },
+  { code: 'EUR', label: 'EUR — Euro' },
+  { code: 'AED', label: 'AED — UAE Dirham' },
+  { code: 'SAR', label: 'SAR — Saudi Riyal' },
+  { code: 'CAD', label: 'CAD — Canadian Dollar' },
+  { code: 'AUD', label: 'AUD — Australian Dollar' },
+  { code: 'INR', label: 'INR — Indian Rupee' },
+  { code: 'CNY', label: 'CNY — Chinese Yuan' },
+  { code: 'JPY', label: 'JPY — Japanese Yen' },
+  { code: 'CHF', label: 'CHF — Swiss Franc' },
+  { code: 'SGD', label: 'SGD — Singapore Dollar' },
+  { code: 'HKD', label: 'HKD — Hong Kong Dollar' },
+  { code: 'NZD', label: 'NZD — New Zealand Dollar' },
+  { code: 'ZAR', label: 'ZAR — South African Rand' },
+  { code: 'TRY', label: 'TRY — Turkish Lira' },
+  { code: 'QAR', label: 'QAR — Qatari Riyal' },
+  { code: 'KWD', label: 'KWD — Kuwaiti Dinar' },
+  { code: 'BHD', label: 'BHD — Bahraini Dinar' },
+  { code: 'OMR', label: 'OMR — Omani Rial' },
+  { code: 'SEK', label: 'SEK — Swedish Krona' },
+  { code: 'NOK', label: 'NOK — Norwegian Krone' },
+  { code: 'DKK', label: 'DKK — Danish Krone' },
+  { code: 'MYR', label: 'MYR — Malaysian Ringgit' },
+  { code: 'THB', label: 'THB — Thai Baht' },
+  { code: 'IDR', label: 'IDR — Indonesian Rupiah' },
+  { code: 'PHP', label: 'PHP — Philippine Peso' },
+  { code: 'BDT', label: 'BDT — Bangladeshi Taka' },
+  { code: 'EGP', label: 'EGP — Egyptian Pound' },
+]

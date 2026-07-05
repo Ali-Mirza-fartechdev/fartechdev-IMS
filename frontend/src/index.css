@@ -32,6 +32,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.5);
+  cursor: pointer;
+}
+
 .skeleton {
   background: linear-gradient(90deg, #1a1a1a 25%, #262626 50%, #1a1a1a 75%);
   background-size: 200% 100%;

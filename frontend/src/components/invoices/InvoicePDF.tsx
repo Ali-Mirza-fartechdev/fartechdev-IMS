@@ -61,7 +61,11 @@ interface InvoicePDFProps {
 }
 
 function fmt(n: number, currency: string) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(n)
+  try {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(n ?? 0)
+  } catch {
+    return `${currency || 'USD'} ${(n ?? 0).toFixed(2)}`
+  }
 }
 
 export default function InvoicePDF({ invoice, settings, logoSrc, signatureSrc }: InvoicePDFProps) {
@@ -86,7 +90,7 @@ export default function InvoicePDF({ invoice, settings, logoSrc, signatureSrc }:
           <View style={styles.box}>
             <View style={styles.boxCol}>
               <Text style={styles.boxLabel}>Bill to:</Text>
-              <Text style={styles.boxLine}>{invoice.client?.name}</Text>
+              <Text style={styles.boxLine}>{invoice.client?.name ?? invoice.client_name_snapshot ?? 'Client'}</Text>
               <Text style={styles.boxLine}>{invoice.client?.phone}</Text>
               <Text style={styles.boxLine}>{invoice.items?.[0]?.service_name ?? ''}</Text>
             </View>
