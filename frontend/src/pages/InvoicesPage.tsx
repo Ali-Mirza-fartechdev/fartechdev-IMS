@@ -36,8 +36,8 @@ export default function InvoicesPage() {
         </Button>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-end gap-3">
-        <div className="relative w-full max-w-xs">
+      <div className="mt-6 flex flex-nowrap items-end gap-3 overflow-x-auto pb-1">
+        <div className="relative w-56 shrink-0">
           <label className="mb-1.5 block text-xs font-medium text-muted">Search</label>
           <Search className="absolute left-3 top-[38px] h-4 w-4 -translate-y-1/2 text-muted" />
           <Input
@@ -47,7 +47,7 @@ export default function InvoicesPage() {
             onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
           />
         </div>
-        <div className="w-40">
+        <div className="w-40 shrink-0">
           <label className="mb-1.5 block text-xs font-medium text-muted">Status</label>
           <Select
             className="h-[42px]"
@@ -59,7 +59,7 @@ export default function InvoicesPage() {
             ))}
           </Select>
         </div>
-        <div className="w-40">
+        <div className="w-40 shrink-0">
           <label className="mb-1.5 block text-xs font-medium text-muted">Client</label>
           <Select
             className="h-[42px]"
@@ -70,7 +70,7 @@ export default function InvoicesPage() {
             {clients?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </Select>
         </div>
-        <div className="w-36">
+        <div className="w-36 shrink-0">
           <label className="mb-1.5 block text-xs font-medium text-muted">From</label>
           <Input
             type="date"
@@ -79,7 +79,7 @@ export default function InvoicesPage() {
             onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value || undefined }))}
           />
         </div>
-        <div className="w-36">
+        <div className="w-36 shrink-0">
           <label className="mb-1.5 block text-xs font-medium text-muted">To</label>
           <Input
             type="date"
@@ -89,7 +89,7 @@ export default function InvoicesPage() {
           />
         </div>
         {(filters.search || (filters.status && filters.status !== 'all') || filters.clientId || filters.dateFrom || filters.dateTo) && (
-          <Button variant="ghost" className="h-[42px]" onClick={() => setFilters({ status: 'all' })}>
+          <Button variant="ghost" className="h-[42px] shrink-0" onClick={() => setFilters({ status: 'all' })}>
             Clear
           </Button>
         )}
