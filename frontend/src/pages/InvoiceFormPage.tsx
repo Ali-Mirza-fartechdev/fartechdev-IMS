@@ -44,7 +44,7 @@ export default function InvoiceFormPage() {
   useEffect(() => {
     if (existing) {
       reset({
-        client_id: existing.client_id,
+        client_id: existing.client_id ?? '',
         invoice_date: existing.invoice_date,
         due_date: existing.due_date,
         currency: existing.currency,
