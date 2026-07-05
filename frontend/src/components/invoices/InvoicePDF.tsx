@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
   footerCompany: { fontSize: 13, fontFamily: 'Helvetica-Bold', color: COLORS.white },
   footerThanks: { fontSize: 8, color: COLORS.mutedGray, marginTop: 6, maxWidth: 220 },
   footerRight: { alignItems: 'center' },
-  signatureImg: { width: 145, height: 145 * 1280 / 921, marginBottom: -8 },
-  signeeName: { fontSize: 9.5, fontFamily: 'Helvetica-Bold', color: COLORS.white, textAlign: 'center', marginTop: 4 },
+  signatureImg: { width: 130, height: 130 * 329 / 582, marginBottom: 2 },
+  signeeName: { fontSize: 9.5, fontFamily: 'Helvetica-Bold', color: COLORS.white, textAlign: 'center' },
   signeeTitle: { fontSize: 8, color: COLORS.mutedGray, textAlign: 'center' },
 })
 
