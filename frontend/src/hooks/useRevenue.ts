@@ -2,28 +2,37 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import type { RevenueSummary, MonthlyRevenue, RevenueByClient, Invoice } from '@/types/database'
 
-export function useRevenueSummary() {
+export interface CurrencyRevenueSummary extends RevenueSummary {
+  currency: string
+}
+
+export function useRevenueSummaryByCurrency() {
   return useQuery({
-    queryKey: ['revenue', 'summary'],
+    queryKey: ['revenue', 'summary-by-currency'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('v_revenue_summary').select('*').single()
+      const { data, error } = await supabase
+        .from('v_revenue_summary_by_currency')
+        .select('*')
+        .order('total_revenue', { ascending: false })
       if (error) throw error
-      return data as RevenueSummary
+      return data as CurrencyRevenueSummary[]
     },
   })
 }
 
-export function useMonthlyRevenue() {
+export function useMonthlyRevenue(currency: string | undefined) {
   return useQuery({
-    queryKey: ['revenue', 'monthly'],
+    queryKey: ['revenue', 'monthly', currency],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('v_monthly_revenue')
         .select('*')
+        .eq('currency', currency)
         .order('month', { ascending: true })
       if (error) throw error
-      return data as MonthlyRevenue[]
+      return data as (MonthlyRevenue & { currency: string })[]
     },
+    enabled: !!currency,
   })
 }
 
@@ -36,7 +45,7 @@ export function useRevenueByClient() {
         .select('*')
         .order('paid_revenue', { ascending: false })
       if (error) throw error
-      return data as RevenueByClient[]
+      return data as (RevenueByClient & { currency: string })[]
     },
   })
 }
@@ -62,11 +71,11 @@ export function useRecentActivity(limit = 8) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('invoices')
-        .select('id, invoice_number, status, updated_at, grand_total')
+        .select('id, invoice_number, status, updated_at, grand_total, currency')
         .order('updated_at', { ascending: false })
         .limit(limit)
       if (error) throw error
-      return data as Pick<Invoice, 'id' | 'invoice_number' | 'status' | 'updated_at' | 'grand_total'>[]
+      return data as Pick<Invoice, 'id' | 'invoice_number' | 'status' | 'updated_at' | 'grand_total' | 'currency'>[]
     },
   })
 }

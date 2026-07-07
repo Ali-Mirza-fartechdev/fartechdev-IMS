@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts'
-import { useRevenueSummary, useMonthlyRevenue, useInvoiceStatusCounts, useRecentActivity } from '@/hooks/useRevenue'
+import { useRevenueSummaryByCurrency, useMonthlyRevenue, useInvoiceStatusCounts, useRecentActivity } from '@/hooks/useRevenue'
 import { Card, Skeleton } from '@/components/ui/primitives'
 import { formatCurrency, formatDate, STATUS_LABELS } from '@/lib/utils'
 import { DollarSign, Clock, CheckCircle2, TrendingUp, Wallet, Calendar } from 'lucide-react'
@@ -8,18 +9,29 @@ const STATUS_ORDER = ['draft', 'sent', 'pending_approval', 'approved', 'pending_
 const PIE_COLORS = ['#6B7280', '#2563EB', '#F59E0B', '#6366F1', '#F97316', '#22C55E', '#10B981', '#EF4444']
 
 export default function DashboardPage() {
-  const { data: summary, isLoading: loadingSummary } = useRevenueSummary()
-  const { data: monthly, isLoading: loadingMonthly } = useMonthlyRevenue()
+  const { data: summaries, isLoading: loadingSummary } = useRevenueSummaryByCurrency()
   const { data: statusCounts, isLoading: loadingStatus } = useInvoiceStatusCounts()
   const { data: activity, isLoading: loadingActivity } = useRecentActivity()
 
+  const [selectedCurrency, setSelectedCurrency] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (summaries && summaries.length > 0 && !selectedCurrency) {
+      setSelectedCurrency(summaries[0].currency)
+    }
+  }, [summaries, selectedCurrency])
+
+  const { data: monthly, isLoading: loadingMonthly } = useMonthlyRevenue(selectedCurrency)
+
+  const activeSummary = summaries?.find((s) => s.currency === selectedCurrency)
+
   const revenueCards = [
-    { label: 'Total Revenue', value: summary?.total_revenue, icon: DollarSign },
-    { label: 'Pending Revenue', value: summary?.pending_revenue, icon: Clock },
-    { label: 'Paid Revenue', value: summary?.paid_revenue, icon: CheckCircle2 },
-    { label: 'Outstanding Revenue', value: summary?.outstanding_revenue, icon: TrendingUp },
-    { label: 'This Month', value: summary?.this_month_revenue, icon: Calendar },
-    { label: 'This Year', value: summary?.this_year_revenue, icon: Wallet },
+    { label: 'Total Revenue', value: activeSummary?.total_revenue, icon: DollarSign },
+    { label: 'Pending Revenue', value: activeSummary?.pending_revenue, icon: Clock },
+    { label: 'Paid Revenue', value: activeSummary?.paid_revenue, icon: CheckCircle2 },
+    { label: 'Outstanding Revenue', value: activeSummary?.outstanding_revenue, icon: TrendingUp },
+    { label: 'This Month', value: activeSummary?.this_month_revenue, icon: Calendar },
+    { label: 'This Year', value: activeSummary?.this_year_revenue, icon: Wallet },
   ]
 
   const totalInvoices = statusCounts ? Object.values(statusCounts).reduce((a, b) => a + b, 0) : 0
@@ -30,8 +42,35 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-      <p className="mt-1 text-sm text-muted">Overview of revenue and invoice activity</p>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <p className="mt-1 text-sm text-muted">Overview of revenue and invoice activity</p>
+        </div>
+
+        {summaries && summaries.length > 1 && (
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-panel p-1">
+            {summaries.map((s) => (
+              <button
+                key={s.currency}
+                onClick={() => setSelectedCurrency(s.currency)}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                  selectedCurrency === s.currency ? 'bg-accent text-white' : 'text-muted hover:text-white'
+                }`}
+              >
+                {s.currency}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {summaries && summaries.length > 1 && (
+        <p className="mt-3 rounded-xl bg-accent/10 px-4 py-2 text-xs text-accent-light">
+          You have invoices in {summaries.length} currencies. Revenue is shown per-currency — totals are not
+          converted or blended together, since exchange rates fluctuate and this system doesn't assume a rate.
+        </p>
+      )}
 
       {/* Revenue Cards */}
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
@@ -44,7 +83,9 @@ export default function DashboardPage() {
             {loadingSummary ? (
               <Skeleton className="mt-2 h-6 w-24" />
             ) : (
-              <p className="mt-2 text-lg font-bold text-white">{formatCurrency(value ?? 0)}</p>
+              <p className="mt-2 text-lg font-bold text-white">
+                {formatCurrency(value ?? 0, selectedCurrency ?? 'USD')}
+              </p>
             )}
           </Card>
         ))}
@@ -67,7 +108,9 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <h3 className="mb-4 text-sm font-semibold text-white">Monthly Revenue</h3>
+          <h3 className="mb-4 text-sm font-semibold text-white">
+            Monthly Revenue {selectedCurrency ? `(${selectedCurrency})` : ''}
+          </h3>
           {loadingMonthly ? (
             <Skeleton className="h-64 w-full" />
           ) : (
@@ -80,10 +123,10 @@ export default function DashboardPage() {
                   stroke="#9A9A9A"
                   fontSize={12}
                 />
-                <YAxis stroke="#9A9A9A" fontSize={12} tickFormatter={(v) => `$${v}`} />
+                <YAxis stroke="#9A9A9A" fontSize={12} />
                 <Tooltip
                   contentStyle={{ background: '#1A1A1A', border: '1px solid #333', borderRadius: 8 }}
-                  formatter={(v: number) => formatCurrency(v)}
+                  formatter={(v: number) => formatCurrency(v, selectedCurrency ?? 'USD')}
                 />
                 <Bar dataKey="revenue" fill="#2563EB" radius={[6, 6, 0, 0]} />
               </BarChart>
@@ -126,7 +169,7 @@ export default function DashboardPage() {
                   {STATUS_LABELS[a.status]}
                 </span>
                 <div className="flex items-center gap-4">
-                  <span className="text-muted">{formatCurrency(a.grand_total)}</span>
+                  <span className="text-muted">{formatCurrency(a.grand_total, a.currency)}</span>
                   <span className="text-xs text-muted">{formatDate(a.updated_at)}</span>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useInvoices } from '@/hooks/useInvoices'
 import { useRevenueByClient, useMonthlyRevenue } from '@/hooks/useRevenue'
 import { Card, Select, Button } from '@/components/ui/primitives'
@@ -12,7 +12,18 @@ export default function ReportsPage() {
   const [reportType, setReportType] = useState<ReportType>('revenue')
   const { data: invoiceData } = useInvoices({}, 1, 1000)
   const { data: byClient } = useRevenueByClient()
-  const { data: monthly } = useMonthlyRevenue()
+  const [monthlyCurrency, setMonthlyCurrency] = useState('USD')
+  const { data: monthly } = useMonthlyRevenue(monthlyCurrency)
+  const availableCurrencies = useMemo(
+    () => Array.from(new Set((invoiceData?.invoices ?? []).map((i) => i.currency))),
+    [invoiceData]
+  )
+
+  useEffect(() => {
+    if (availableCurrencies.length > 0 && !availableCurrencies.includes(monthlyCurrency)) {
+      setMonthlyCurrency(availableCurrencies[0])
+    }
+  }, [availableCurrencies, monthlyCurrency])
 
   const rows = useMemo(() => {
     const invoices = invoiceData?.invoices ?? []
@@ -82,32 +93,50 @@ export default function ReportsPage() {
       </div>
 
       {reportType === 'revenue' && (
-        <Card className="mt-6 !p-0 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="border-b border-border text-left text-xs text-muted">
-              <tr><th className="px-5 py-3">Month</th><th className="px-5 py-3 text-right">Revenue</th></tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {monthly?.map((m) => (
-                <tr key={m.month}><td className="px-5 py-3 text-white">{formatDate(m.month)}</td><td className="px-5 py-3 text-right text-white">{formatCurrency(m.revenue)}</td></tr>
+        <>
+          {availableCurrencies.length > 1 && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-panel p-1 w-fit">
+              {availableCurrencies.map((cur) => (
+                <button
+                  key={cur}
+                  onClick={() => setMonthlyCurrency(cur)}
+                  className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                    monthlyCurrency === cur ? 'bg-accent text-white' : 'text-muted hover:text-white'
+                  }`}
+                >
+                  {cur}
+                </button>
               ))}
-            </tbody>
-          </table>
-        </Card>
+            </div>
+          )}
+          <Card className="mt-4 !p-0 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border text-left text-xs text-muted">
+                <tr><th className="px-5 py-3">Month</th><th className="px-5 py-3 text-right">Revenue ({monthlyCurrency})</th></tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {monthly?.map((m) => (
+                  <tr key={m.month}><td className="px-5 py-3 text-white">{formatDate(m.month)}</td><td className="px-5 py-3 text-right text-white">{formatCurrency(m.revenue, monthlyCurrency)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </>
       )}
 
       {reportType === 'by_client' && (
         <Card className="mt-6 !p-0 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="border-b border-border text-left text-xs text-muted">
-              <tr><th className="px-5 py-3">Client</th><th className="px-5 py-3 text-right">Paid Revenue</th><th className="px-5 py-3 text-right">Outstanding</th></tr>
+              <tr><th className="px-5 py-3">Client</th><th className="px-5 py-3">Currency</th><th className="px-5 py-3 text-right">Paid Revenue</th><th className="px-5 py-3 text-right">Outstanding</th></tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {byClient?.map((c) => (
-                <tr key={c.client_id}>
+              {byClient?.filter((c) => c.currency).map((c) => (
+                <tr key={`${c.client_id}-${c.currency}`}>
                   <td className="px-5 py-3 text-white">{c.client_name}</td>
-                  <td className="px-5 py-3 text-right text-white">{formatCurrency(c.paid_revenue ?? 0)}</td>
-                  <td className="px-5 py-3 text-right text-muted">{formatCurrency(c.outstanding ?? 0)}</td>
+                  <td className="px-5 py-3 text-muted">{c.currency}</td>
+                  <td className="px-5 py-3 text-right text-white">{formatCurrency(c.paid_revenue ?? 0, c.currency)}</td>
+                  <td className="px-5 py-3 text-right text-muted">{formatCurrency(c.outstanding ?? 0, c.currency)}</td>
                 </tr>
               ))}
             </tbody>
