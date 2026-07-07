@@ -138,6 +138,22 @@ export default function InvoicePDF({ invoice, settings, logoSrc, signatureSrc }:
             <Text style={styles.grandTotalLabel}>Grand total</Text>
             <Text style={styles.grandTotalValue}>{fmt(invoice.grand_total, currency)}</Text>
           </View>
+          {invoice.amount_paid > 0 && (
+            <>
+              <View style={[styles.totalsRow, { marginTop: 10 }]}>
+                <Text style={[styles.totalsLabel, { color: '#22C55E' }]}>Amount Paid</Text>
+                <Text style={[styles.totalsValue, { color: '#22C55E' }]}>{fmt(invoice.amount_paid, currency)}</Text>
+              </View>
+              <View style={styles.totalsRow}>
+                <Text style={[styles.totalsLabel, { fontFamily: 'Helvetica-Bold', color: COLORS.white }]}>
+                  Balance Due
+                </Text>
+                <Text style={[styles.totalsValue, { fontFamily: 'Helvetica-Bold', color: COLORS.white }]}>
+                  {fmt(invoice.balance_due, currency)}
+                </Text>
+              </View>
+            </>
+          )}
         </View>
 
         <View style={styles.footer} fixed>
